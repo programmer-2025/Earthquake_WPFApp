@@ -14,11 +14,16 @@ namespace Earthquake_WPFApp
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
-    {
-        public MainWindow()
-        {
+    public partial class MainWindow : Window {
+        public MainWindow() {
             InitializeComponent();
+
+            var api = EarthquakeData.GetInstance()[0];
+            ScaleText.Text = (api.earthquake.maxScale / 10).ToString();
+            DateText.Text = api.issue.time;
+            LocationNameText.Text = api.earthquake.hypocenter.name;
+            DepthText.Text = api.earthquake.hypocenter.depth.ToString();
+            MagnitudeText.Text = api.earthquake.hypocenter.magnitude.ToString();
         }
     }
 }
