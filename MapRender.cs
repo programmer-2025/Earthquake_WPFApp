@@ -62,9 +62,9 @@ namespace Earthquake_WPFApp {
         /// <param name="color">色</param>
         /// <param name="filterFunc">塗る範囲</param>
         public MapRender SetFill(Color color, Func<IFeature, bool> filterFunc) {
-            actionList.Add(graphics => {
-                var brush = new SolidBrush(color);
-                foreach (var filter in GetFilter(filterFunc)) {
+            var brush = new SolidBrush(color);
+            actionList.Add(graphics => {        
+                foreach (var filter in featureList.Where(filterFunc)) {
                     DrawGeometry(graphics, null, brush, filter.Geometry);
                 }
             });
@@ -77,18 +77,40 @@ namespace Earthquake_WPFApp {
         /// <param name="color">色</param>
         /// <param name="filterFunc">塗る範囲</param>
         public MapRender AddLine(Color color, int strokeSize, Func<IFeature, bool> filterFunc) {
-            actionList.Add(graphics => {
-                var pen = new Pen(color, strokeSize);
-
-                foreach (var filter in GetFilter(filterFunc))　{
+            var pen = new Pen(color, strokeSize);
+            actionList.Add(graphics => {        
+                foreach (var filter in featureList.Where(filterFunc))　{
                     DrawGeometry(graphics, pen, null, filter.Geometry);
                 }
             });
             return this;
         }
 
-        private IEnumerable<IFeature> GetFilter(Func<IFeature, bool> func) {
-            return featureList.Where(func);
+        private void DrawGeometry(Graphics graphics, Pen pen, Brush brush, Geometry geometry) {
+            if (geometry is Polygon polygon) DrawPolygon(graphics, pen, brush, polygon);
+            else if (geometry is MultiPolygon multiPolygon)
+            {
+                foreach (Polygon p in multiPolygon.Geometries)
+                    DrawPolygon(graphics, pen, brush, p);
+            }
+        }
+
+        /// <summary>
+        /// ポリゴンを描画する関数
+        /// </summary>
+        private void DrawPolygon(Graphics graphics, Pen pen, Brush brush, Polygon polygon)
+        {
+            using var path = new GraphicsPath();
+            path.FillMode = FillMode.Winding;
+            path.AddPolygon(ToPoints(polygon.ExteriorRing.Coordinates));
+
+            foreach (var hole in polygon.InteriorRings)
+            {
+                path.AddPolygon(ToPoints(hole.Coordinates));
+            }
+        
+            if (brush != null) graphics.FillPath(brush, path);
+            if (pen != null) graphics.DrawPolygon(pen, ToPoints(polygon.ExteriorRing.Coordinates));
         }
 
         /// <summary>
@@ -96,10 +118,9 @@ namespace Earthquake_WPFApp {
         /// </summary>
         /// <returns></returns>
         public MapRender SetDrawArea(Func<IFeature, bool> filter) {
-            List<Envelope>? envelopes = GetFilter(filter)
+            List<Envelope>? envelopes = featureList.Where(filter)
                 .Select(feature => feature.Geometry.EnvelopeInternal)
                 .ToList();  // IFeatureのリストから、Envelopeを取得し、Envelopeのリストにする
-
 
             if (envelopes.Count == 0) {
                 // 見つからない場合は新しいインスタンスを返す
@@ -125,30 +146,6 @@ namespace Earthquake_WPFApp {
                 foreach (var action in actionList) action(graphic); // リストにたまったアクションを実行する
             }
             return bitmap;
-        }
-
-        private void DrawGeometry(Graphics graphics, Pen pen, Brush brush, Geometry geometry) {
-            if (geometry is Polygon polygon) DrawPolygon(graphics, pen, brush, polygon);
-            else if (geometry is MultiPolygon multiPolygon) {
-                foreach (Polygon p in multiPolygon.Geometries) 
-                    DrawPolygon(graphics, pen, brush, p);
-            }
-        }
-
-        /// <summary>
-        /// ポリゴンを描画する関数
-        /// </summary>
-        private void DrawPolygon(Graphics graphics, Pen pen, Brush brush, Polygon polygon) {
-            using var path = new GraphicsPath();
-            path.AddPolygon(ToPoints(polygon.ExteriorRing.Coordinates));
-
-            foreach (var hole in polygon.InteriorRings) {
-                path.AddPolygon(ToPoints(hole.Coordinates));
-            }
-
-            path.FillMode = FillMode.Winding;
-            if (brush != null)  graphics.FillPath(brush, path);
-            if (pen != null) graphics.DrawPolygon(pen, ToPoints(polygon.ExteriorRing.Coordinates));
         }
 
         /// <summary>
