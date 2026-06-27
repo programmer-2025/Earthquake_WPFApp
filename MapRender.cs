@@ -30,6 +30,8 @@ namespace Earthquake_WPFApp {
         private readonly List<IFeature> featureList;    //  属性と図形のリスト
         private readonly List<Action<Graphics>> actionList; //　最終的に実行するアクションのリスト
 
+        private readonly Dictionary<IFeature, string?> regionNameMap;
+        private readonly Dictionary<IFeature, string?> nameMap;
 
         public MapRender(string path, int width, int height) {
             this.bitmap = new Bitmap(width, height);
@@ -38,6 +40,16 @@ namespace Earthquake_WPFApp {
             this.actionList = [];
             this.envelope = new Envelope();
 
+            this.regionNameMap = [];
+            this.regionNameMap = featureList.ToDictionary(
+                f => f,
+                f => f.Attributes["regionname"]?.ToString());
+            this.nameMap = [];
+            this.nameMap = featureList.ToDictionary(
+                f => f,
+                f => f.Attributes["name"]?.ToString()
+            );
+                
             while (reader.Read()) { // ファイルから読む
                 var geometry = reader.Geometry;
                 var attributes = new AttributesTable(); //　属性
@@ -98,19 +110,17 @@ namespace Earthquake_WPFApp {
         /// <summary>
         /// ポリゴンを描画する関数
         /// </summary>
-        private void DrawPolygon(Graphics graphics, Pen pen, Brush brush, Polygon polygon)
-        {
+        private void DrawPolygon(Graphics graphics, Pen pen, Brush brush, Polygon polygon) {
+            var pointF = ToPoints(polygon.ExteriorRing.Coordinates);
             using var path = new GraphicsPath();
-            path.FillMode = FillMode.Winding;
-            path.AddPolygon(ToPoints(polygon.ExteriorRing.Coordinates));
+            path.AddPolygon(pointF);
 
-            foreach (var hole in polygon.InteriorRings)
-            {
+            foreach (var hole in polygon.InteriorRings) {
                 path.AddPolygon(ToPoints(hole.Coordinates));
             }
         
             if (brush != null) graphics.FillPath(brush, path);
-            if (pen != null) graphics.DrawPolygon(pen, ToPoints(polygon.ExteriorRing.Coordinates));
+            if (pen != null) graphics.DrawPolygon(pen, pointF);
         }
 
         /// <summary>

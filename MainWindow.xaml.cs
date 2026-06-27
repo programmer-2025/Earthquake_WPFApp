@@ -73,12 +73,13 @@ namespace Earthquake_WPFApp
         }
 
         public async Task setImageAsync() {
+            MapRender backDrawMap = new("./Resource/市町村等.shp", 1000, 1000);
+            MapRender forwardDrawMap = new("./Resource/府県予報区等.shp", 1000, 1000);
+            DateTime beforeTime = DateTime.Now;
             await Task.Run(() => {
                 var earthquakeData = EarthquakeData.GetInstance()[0];
                 var earthquake = earthquakeData.earthquake;
                 var hypocenter = earthquake.hypocenter;
-                MapRender backDrawMap = new("./Resource/市町村等.shp",1000, 1000);
-                MapRender forwardDrawMap = new("./Resource/府県予報区等.shp", 1000, 1000);
 
                 // 各震度地点ごとに色設定
                 foreach (var point in earthquakeData.points) {
@@ -136,6 +137,10 @@ namespace Earthquake_WPFApp
                             BitmapSizeOptions.FromEmptyOptions());
 
                     EarthquakeImage.Source = imageSource;   // WPF側に画像をセットする
+
+                    DateTime afterTime = DateTime.Now;
+                    TimeSpan subtractTime = beforeTime.Subtract(afterTime);
+                    Debug.Write("描画に成功しました：" + subtractTime.ToString("hh\\:mm\\:ss"));
                 });
             });
         }
