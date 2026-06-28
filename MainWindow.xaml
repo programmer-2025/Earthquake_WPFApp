@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Earthquake_WPFApp"
+        xmlns:local="clr-namespace:Earthquake_WPFApp" d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
         mc:Ignorable="d"
         Title="MainWindow" Height="150" Width="800">
     <Grid Background="AliceBlue">
@@ -12,14 +12,27 @@
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
 
-        <Image Name="EarthquakeImage" Grid.ColumnSpan="4" Grid.Row="0"></Image>
-        <TextBlock Background="#FF504B4B" Grid.Column="0" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Text="※地図データ：気象庁（https://www.data.jma.go.jp/developer/gis.html）を加工して利用" Foreground="White"></TextBlock>
+        <Menu Grid.ColumnSpan="4" Grid.Row="0">
+            <MenuItem Header="ファイル">
+                <MenuItem Header="終了する" Command="{Binding MenuCommand.ExitCommand}"></MenuItem>
+            </MenuItem>
+            <MenuItem Header="ウインドウ">
+                <MenuItem Header="背景の色を変更" Command="{Binding MenuCommand.ChangeBackgroundCommand}"></MenuItem>
+            </MenuItem>
+            <MenuItem Header="ヘルプ">
+                <MenuItem Header="このアプリについて" Command="{Binding MenuCommand.AboutCommand}"></MenuItem>
+            </MenuItem>
+        </Menu>
 
-        <Grid Grid.Column="0" Grid.Row="1" Background="#333030">
+        <Image Name="EarthquakeImage" Grid.ColumnSpan="4" Grid.Row="1"></Image>
+        <TextBlock Background="#FF504B4B" Grid.Column="1" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Text="※地図データ：気象庁（https://www.data.jma.go.jp/developer/gis.html）を加工して利用" Foreground="White"></TextBlock>
+
+        <Grid Grid.Column="0" Grid.Row="2" Background="#333030">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>

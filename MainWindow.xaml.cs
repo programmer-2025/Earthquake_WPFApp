@@ -11,7 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
+using Application = System.Windows.Application;
 using Color = System.Drawing.Color;
 
 namespace Earthquake_WPFApp
@@ -22,6 +22,7 @@ namespace Earthquake_WPFApp
     public partial class MainWindow : Window {
         public MainWindow() {
             InitializeComponent();
+            DataContext = new MainViewModel();
 
             var api = EarthquakeData.GetInstance()[0];
             ScaleText.Text = (api.earthquake.maxScale / 10).ToString();
