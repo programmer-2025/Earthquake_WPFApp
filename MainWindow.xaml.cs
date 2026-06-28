@@ -116,10 +116,15 @@ namespace Earthquake_WPFApp
 
                 backDrawMap.SetDrawArea(backDrawFilter);   // 描画範囲を設定する
                 forwardDrawMap.SetDrawArea(forwardDrawFilter);
+                forwardDrawMap.AddImage("./Resource/point.png", hypocenter.longitude, hypocenter.latitude);
+                
+
 
                 var backDrawMapBuild = backDrawMap.Build();
                 var forwardDrawMapBuild = forwardDrawMap.Build();
                 //forwardDrawMapBuild.Save("debug2.png");
+
+             
 
                 using Bitmap image = new(1000, 1000);
                 using (Graphics graphics = Graphics.FromImage(image)) {

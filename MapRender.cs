@@ -1,14 +1,17 @@
-﻿using System;
+﻿using NetTopologySuite.Algorithm;
+using NetTopologySuite.Features;
+using NetTopologySuite.Geometries;
+using NetTopologySuite.IO;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Text;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using NetTopologySuite.Features;
-using NetTopologySuite.Geometries;
-using NetTopologySuite.IO;
+using static Earthquake_WPFApp.EarthquakeData.Earthquake;
 using Brush = System.Drawing.Brush;
 using Color = System.Drawing.Color;
 using Geometry = NetTopologySuite.Geometries.Geometry;
@@ -98,6 +101,22 @@ namespace Earthquake_WPFApp {
             return this;
         }
 
+        public MapRender AddImage(string path, double longitude, double latitude) {
+            actionList.Add(graphics => {
+                var coordinate = new Coordinate(longitude, latitude);
+                envelope.ExpandToInclude(new Coordinate(longitude, latitude));
+                PointF point = ToPoint(coordinate);    // 緯度経度
+                Bitmap image = new Bitmap(path);
+                graphics.DrawImage( image,
+                                    point.X - image.Width / 2.0f,
+                                    point.Y - image.Height / 2.0f,
+                                    image.Width,
+                                    image.Height);
+            });
+
+            return this;
+        }  
+
         private void DrawGeometry(Graphics graphics, Pen pen, Brush brush, Geometry geometry) {
             if (geometry is Polygon polygon) DrawPolygon(graphics, pen, brush, polygon);
             else if (geometry is MultiPolygon multiPolygon)
@@ -168,6 +187,15 @@ namespace Earthquake_WPFApp {
 
                 return new PointF(x, y);
             }).ToArray();
+        }
+
+        /// <summary>
+        /// CoordinateをPointFに変換する関数
+        /// </summary>
+        private PointF ToPoint(Coordinate coordinate) {
+            float x = (float)((coordinate.X - envelope.MinX) * bitmap.Width / envelope.Width);
+            float y = (float)((envelope.MaxY - coordinate.Y) * bitmap.Height / envelope.Height);
+            return new PointF(x, y);
         }
     }
 }
