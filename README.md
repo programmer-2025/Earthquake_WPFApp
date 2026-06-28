@@ -6,7 +6,6 @@
 * NetTopologySuite（https://github.com/programmer-2025/Earthquake_WPFApp/blob/main/license.md ）
 * 気象庁のGISデータ（※加工して利用）：https://www.data.jma.go.jp/developer/gis.html
 
-# 動作イメージ（2026/6/27時点）
-<img width="880" height="683" alt="image" src="https://github.com/user-attachments/assets/3f0c7309-7425-4f8e-86bc-110ff7b05c3f" />
-
+# 動作イメージ（2026/6/28時点）
+<img width="791" height="512" alt="image" src="https://github.com/user-attachments/assets/a09c56d8-7124-4cd3-a91d-85dd688f1ef0" />
 
